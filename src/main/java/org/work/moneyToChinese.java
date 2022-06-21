@@ -3,8 +3,6 @@ package org.work;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -16,7 +14,7 @@ public class moneyToChinese {
         System.out.println(a);
         System.out.println(a.getClass().getSimpleName());
         //System.out.println(c1);
-        String f=x.moneyInChinese("987654321");
+        String f=x.moneyInChinese("9600000000000000");
         System.out.println(f);
     }
     public String moneyInChinese(BigDecimal x){
@@ -26,7 +24,6 @@ public class moneyToChinese {
 
     public String moneyInChinese(String x){
         String result=null;
-        String tmp=null;
         String[] splits=null;
         String integerStr;
         String decimalStr;
@@ -50,17 +47,7 @@ public class moneyToChinese {
             return "規格不符!請重新輸入,謝謝";
         }
 
-        //初始化：分離整數部分和小數部分
-        if (x.indexOf(".")!=-1) {
-            splits=x.split("\\.");
-            integerStr=splits[0];
-            decimalStr=splits[1];
-            System.out.println("整數部分:"+integerStr);
-            System.out.println("小數部分:"+decimalStr);
-        }else {
-            integerStr=x;
-            decimalStr="";
-        }
+
 
 
 
@@ -72,9 +59,9 @@ public class moneyToChinese {
 
 
         //將字串轉入int陣列(有利於後續判斷)
-        int[] integers=new int[integerStr.length()];
-        for (int i = 0; i <integerStr.length() ; i++) {
-            integers[i]=Integer.parseInt(integerStr.substring(i,i+1));
+        int[] integers=new int[x.length()];
+        for (int i = 0; i <x.length() ; i++) {
+            integers[i]=Integer.parseInt(x.substring(i,i+1));
         }
 
         //將整數部分轉為大寫金額
@@ -97,19 +84,19 @@ public class moneyToChinese {
 
         //這邊就是用上面的方法這樣找的話單位會有重複的(玖仟兆陸佰兆元)
         //然後下面這邊是把key從字串變成陣列後再丟入arraylist時去做判斷
-        List<String> list=new ArrayList<>();
+        List<String> resultList=new ArrayList<>();
         int[] duplicateNum = new int[0];
         String[] s=key.split("");
         for(int i=s.length-1;i>=0;i--){
-            if(s[i].equals("萬")&&list.contains("萬")|| s[i].equals("億")&&list.contains("億")|| s[i].equals("兆")&& list.contains("兆")){
+            if(s[i].equals("萬")&&resultList.contains("萬")|| s[i].equals("億")&&resultList.contains("億")|| s[i].equals("兆")&& resultList.contains("兆")){
                 continue;
             }else {
-                list.add(s[i]);
+                resultList.add(s[i]);
             }
         }
         String out="";
-        for (int i = list.size()-1; i >=0 ; i--) {
-            out+=list.get(i);
+        for (int i = resultList.size()-1; i >=0 ; i--) {
+            out+=resultList.get(i);
         }
         result=out;
         return result;
@@ -127,4 +114,93 @@ public class moneyToChinese {
        String result=df.format(x);
        return result;
     }
+
+    public String moneyInEnglish(BigDecimal x){
+        String result=moneyInEnglish(x.toString());
+        return result;
+    }
+
+    public String moneyInEnglish(String x){
+        //以下是各個數字的英文都集中在這邊
+        final String[] numbers={"","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"};
+        final String[] tenNumbers={"Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"};
+        final String[] tensNumbers={"Twenty","Thirty","Fourty","Fifty","Sixty","Seventy","Eighty","Ninety"};
+        //這區要特別講一下(Billion=10億,如果要表達1億的話要寫成One Hundred Million,unit的陣列裡面最後一個Trillion是兆)
+        final String[] unit={"Hundred","Thousand","Million","Billion","Trillion"};
+
+        String result = "";
+
+        //如果單位超過兆的話就會回復說超出受理範圍(16位是到千兆所以如果超過就無法受理)
+        if(x.length()>16){
+            System.out.println("抱歉!您輸入的金額超出系統受理的範圍");
+        }
+
+        //先判斷輸入的參數是否為空白或是非數字
+        //如果傳進來的數字是負的,也會在這邊一樣被過濾掉(因為這邊的正規表示法沒有把負號算進去)
+        if(x.isEmpty() || x.matches("\\d+")){
+            if(x.isEmpty()) {
+                System.out.println("");
+            }
+            System.out.println("格式不符!請重新輸入,謝謝");
+        }
+
+        //如果輸入進來的數字是0的話,這邊就會直接回傳0對應的英文給他(Zero)
+        if("0".equals(x)){
+            return result="Zero";
+        }
+
+        //先將輸入進來的金額轉成int型態然後將數字以3個單位為一組加上分隔符去區分(以利於之後的計算)
+        //這邊就是把輸入進來的數字以三個為一組然後依序加入到digitGroups
+        int input_number=Integer.parseInt(x);
+        int[] digitGroups=new int[]{0,0,0,0,0};
+        for(int i=0;i<digitGroups.length;i++){
+            digitGroups[i]=input_number%1000;
+            input_number=input_number/1000;
+        }
+
+        //處理每段金額轉英文(百位+十位+各位)
+        String combine1="";
+        String combine2="";
+        String[] groupText=new String[]{"","","","",""};
+        for (int i = 0; i <5 ; i++) {
+            int hundred=digitGroups[i]/100;
+            int tenUnits=digitGroups[i]%100;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        return result;
+
+    }
+
 }
